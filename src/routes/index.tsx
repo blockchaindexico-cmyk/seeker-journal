@@ -68,8 +68,10 @@ function Index() {
       <div className="cinema-glow border-b border-border">
         <header className="mx-auto flex max-w-7xl flex-wrap items-end justify-between gap-6 px-6 py-12">
           <div>
-            <p className="text-[11px] tracking-[0.35em] text-primary uppercase">Trackr</p>
-            <h1 className="display-title mt-2 text-5xl text-foreground sm:text-6xl">
+            <p className="display-title text-2xl tracking-[0.28em] text-primary sm:text-3xl">
+              Trackr
+            </p>
+            <h1 className="display-title mt-3 text-5xl text-foreground sm:text-7xl">
               Your job hunt, finally in order.
             </h1>
             <p className="mt-3 max-w-xl text-sm text-muted-foreground">
