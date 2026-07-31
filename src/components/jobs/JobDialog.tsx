@@ -152,7 +152,7 @@ export function JobDialog({ job, open, onOpenChange, onSave, onDelete }: Props) 
           <TabsContent value="ai">
             <AiComposer
               job={draft}
-              jd={draft.jobDescription}
+              jd={draft.jobDescription ?? ""}
               onJdChange={(v) => set("jobDescription", v)}
             />
           </TabsContent>
