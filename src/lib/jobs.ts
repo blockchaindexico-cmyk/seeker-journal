@@ -59,6 +59,7 @@ export type Job = {
   called: boolean;
   interviewAt: string;
   followUpAt: string;
+  jobDescription: string;
   notes: string;
   createdAt: string;
 };
@@ -85,6 +86,7 @@ export function emptyJob(): Job {
     called: false,
     interviewAt: "",
     followUpAt: "",
+    jobDescription: "",
     notes: "",
     createdAt: new Date().toISOString(),
   };
