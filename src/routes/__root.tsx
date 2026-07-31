@@ -93,6 +93,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Trackr — Job Application Tracker" },
       { name: "twitter:description", content: "Track every job application in one cinematic workspace: links, platforms, recruiter contacts, follow-ups, interviews and AI-assisted notes." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b0f6dbfb-40e1-4135-9613-79d63cf995dc/id-preview-35168582--a92b8b5d-ed3f-413c-83ef-425c8db200ea.lovable.app-1785475543577.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b0f6dbfb-40e1-4135-9613-79d63cf995dc/id-preview-35168582--a92b8b5d-ed3f-413c-83ef-425c8db200ea.lovable.app-1785475543577.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
