@@ -142,3 +142,29 @@
     color: var(--color-foreground);
   }
 }
+
+@layer base {
+  body {
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@utility display-title {
+  font-family: "Instrument Serif", ui-serif, Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+@utility panel {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  background-color: color-mix(in oklch, var(--color-card) 70%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+@utility cinema-glow {
+  background-image:
+    radial-gradient(60% 120% at 12% 0%, color-mix(in oklch, var(--color-primary) 18%, transparent), transparent 70%),
+    radial-gradient(50% 100% at 90% 10%, color-mix(in oklch, var(--color-chart-5) 14%, transparent), transparent 70%);
+}
