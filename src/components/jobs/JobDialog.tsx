@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { AiComposer } from "./AiComposer";
 import { STATUSES, STATUS_LABEL, PLATFORMS, type Job } from "@/lib/jobs";
 import { cn } from "@/lib/utils";
 
@@ -56,10 +57,11 @@ export function JobDialog({ job, open, onOpenChange, onSave, onDelete }: Props) 
         </DialogHeader>
 
         <Tabs defaultValue="details">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="links">Links & contact</TabsTrigger>
             <TabsTrigger value="progress">Progress</TabsTrigger>
+            <TabsTrigger value="ai">AI</TabsTrigger>
           </TabsList>
 
           <TabsContent value="details" className="space-y-4 pt-4">
@@ -145,6 +147,14 @@ export function JobDialog({ job, open, onOpenChange, onSave, onDelete }: Props) 
             </div>
             <ToggleRow label="They responded" checked={draft.responded} onChange={(v) => set("responded", v)} />
             <ToggleRow label="Call happened" checked={draft.called} onChange={(v) => set("called", v)} />
+          </TabsContent>
+
+          <TabsContent value="ai">
+            <AiComposer
+              job={draft}
+              jd={draft.jobDescription ?? ""}
+              onJdChange={(v) => set("jobDescription", v)}
+            />
           </TabsContent>
         </Tabs>
 
