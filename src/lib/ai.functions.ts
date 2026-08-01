@@ -7,6 +7,7 @@ const Input = z.object({
   company: z.string().default(""),
   role: z.string().default(""),
   hrName: z.string().default(""),
+  extra: z.string().default(""),
   tone: z.string().default("warm, confident, concise"),
 });
 
@@ -40,6 +41,10 @@ export const generateOutreach = createServerFn({ method: "POST" })
         `Role: ${data.role || "unknown"}`,
         `Recruiter name: ${data.hrName || "unknown — use a neutral greeting"}`,
         `Tone: ${data.tone}`,
+        "",
+        data.extra.trim()
+          ? `Extra instructions from the candidate (follow these closely):\n${data.extra.slice(0, 2000)}`
+          : "",
         "",
         "Job description / posting:",
         data.jobDescription.slice(0, 8000),
