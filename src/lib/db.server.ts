@@ -43,6 +43,10 @@ export async function ensureSchema() {
           created_at timestamptz NOT NULL DEFAULT now()
         )
       `;
+      await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS ai_extra text NOT NULL DEFAULT ''`;
+      await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS gen_email text NOT NULL DEFAULT ''`;
+      await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS gen_linkedin text NOT NULL DEFAULT ''`;
+      await sql`ALTER TABLE jobs ADD COLUMN IF NOT EXISTS gen_whatsapp text NOT NULL DEFAULT ''`;
     })().catch((error) => {
       schemaReady = undefined;
       throw error;
@@ -77,6 +81,10 @@ export function rowToJob(r: Row) {
     followUpAt: (r["follow_up_at"] as string) ?? "",
     jobDescription: (r["job_description"] as string) ?? "",
     notes: (r["notes"] as string) ?? "",
+    aiExtra: (r["ai_extra"] as string) ?? "",
+    genEmail: (r["gen_email"] as string) ?? "",
+    genLinkedin: (r["gen_linkedin"] as string) ?? "",
+    genWhatsapp: (r["gen_whatsapp"] as string) ?? "",
     createdAt: new Date(r["created_at"] as string).toISOString(),
   };
 }
