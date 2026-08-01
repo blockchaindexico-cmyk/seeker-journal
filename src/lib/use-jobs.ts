@@ -1,40 +1,40 @@
-import { useCallback, useEffect, useState } from "react";
-import type { Job } from "./jobs";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 
-const KEY = "trackr.jobs.v1";
+import type { Job } from "./jobs";
+import { deleteJob, listJobs, saveJob } from "./jobs.functions";
+
+const KEY = ["jobs"] as const;
 
 export function useJobs() {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [ready, setReady] = useState(false);
+  const queryClient = useQueryClient();
+  const fetchJobs = useServerFn(listJobs);
+  const save = useServerFn(saveJob);
+  const remove = useServerFn(deleteJob);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(KEY);
-      if (raw) setJobs(JSON.parse(raw) as Job[]);
-    } catch {
-      /* ignore */
-    }
-    setReady(true);
-  }, []);
+  const query = useQuery({
+    queryKey: KEY,
+    queryFn: () => fetchJobs() as Promise<Job[]>,
+  });
 
-  useEffect(() => {
-    if (!ready) return;
-    localStorage.setItem(KEY, JSON.stringify(jobs));
-  }, [jobs, ready]);
+  const saveMutation = useMutation({
+    mutationFn: (job: Job) => save({ data: job }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
+    onError: (error: Error) => toast.error(error.message),
+  });
 
-  const upsert = useCallback((job: Job) => {
-    setJobs((prev) => {
-      const i = prev.findIndex((j) => j.id === job.id);
-      if (i === -1) return [job, ...prev];
-      const next = [...prev];
-      next[i] = job;
-      return next;
-    });
-  }, []);
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => remove({ data: { id } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: KEY }),
+    onError: (error: Error) => toast.error(error.message),
+  });
 
-  const remove = useCallback((id: string) => {
-    setJobs((prev) => prev.filter((j) => j.id !== id));
-  }, []);
-
-  return { jobs, ready, upsert, remove };
+  return {
+    jobs: query.data ?? [],
+    ready: !query.isLoading,
+    error: query.error as Error | null,
+    upsert: (job: Job) => saveMutation.mutate(job),
+    remove: (id: string) => deleteMutation.mutate(id),
+  };
 }
