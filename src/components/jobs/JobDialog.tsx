@@ -154,6 +154,18 @@ export function JobDialog({ job, open, onOpenChange, onSave, onDelete }: Props) 
               job={draft}
               jd={draft.jobDescription ?? ""}
               onJdChange={(v) => set("jobDescription", v)}
+              extra={draft.aiExtra ?? ""}
+              onExtraChange={(v) => set("aiExtra", v)}
+              onGenerated={(channel, text) =>
+                set(
+                  channel === "email"
+                    ? "genEmail"
+                    : channel === "linkedin"
+                      ? "genLinkedin"
+                      : "genWhatsapp",
+                  text,
+                )
+              }
             />
           </TabsContent>
         </Tabs>

@@ -61,6 +61,10 @@ export type Job = {
   followUpAt: string;
   jobDescription: string;
   notes: string;
+  aiExtra: string;
+  genEmail: string;
+  genLinkedin: string;
+  genWhatsapp: string;
   createdAt: string;
 };
 
@@ -88,6 +92,10 @@ export function emptyJob(): Job {
     followUpAt: "",
     jobDescription: "",
     notes: "",
+    aiExtra: "",
+    genEmail: "",
+    genLinkedin: "",
+    genWhatsapp: "",
     createdAt: new Date().toISOString(),
   };
 }

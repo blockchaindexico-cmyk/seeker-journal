@@ -27,5 +27,9 @@ export const jobSchema = z.object({
   followUpAt: str,
   jobDescription: str,
   notes: str,
+  aiExtra: str,
+  genEmail: str,
+  genLinkedin: str,
+  genWhatsapp: str,
   createdAt: z.string(),
 });

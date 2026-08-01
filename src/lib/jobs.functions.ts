@@ -22,13 +22,15 @@ export const saveJob = createServerFn({ method: "POST" })
         id, company, role, location, salary, status, applied_via, applied_at,
         website_url, linkedin_url, job_post_url, extra_links,
         hr_name, hr_email, hr_linkedin, is_hr_contact,
-        responded, called, interview_at, follow_up_at, job_description, notes, created_at
+        responded, called, interview_at, follow_up_at, job_description, notes,
+        ai_extra, gen_email, gen_linkedin, gen_whatsapp, created_at
       ) VALUES (
         ${j.id}, ${j.company}, ${j.role}, ${j.location}, ${j.salary}, ${j.status},
         ${j.appliedVia}, ${j.appliedAt}, ${j.websiteUrl}, ${j.linkedinUrl},
         ${j.jobPostUrl}, ${j.extraLinks}, ${j.hrName}, ${j.hrEmail}, ${j.hrLinkedin},
         ${j.isHrContact}, ${j.responded}, ${j.called}, ${j.interviewAt},
-        ${j.followUpAt}, ${j.jobDescription}, ${j.notes}, ${j.createdAt}
+        ${j.followUpAt}, ${j.jobDescription}, ${j.notes},
+        ${j.aiExtra}, ${j.genEmail}, ${j.genLinkedin}, ${j.genWhatsapp}, ${j.createdAt}
       )
       ON CONFLICT (id) DO UPDATE SET
         company = EXCLUDED.company,
@@ -51,10 +53,51 @@ export const saveJob = createServerFn({ method: "POST" })
         interview_at = EXCLUDED.interview_at,
         follow_up_at = EXCLUDED.follow_up_at,
         job_description = EXCLUDED.job_description,
-        notes = EXCLUDED.notes
+        notes = EXCLUDED.notes,
+        ai_extra = EXCLUDED.ai_extra,
+        gen_email = EXCLUDED.gen_email,
+        gen_linkedin = EXCLUDED.gen_linkedin,
+        gen_whatsapp = EXCLUDED.gen_whatsapp
       RETURNING *
     `;
     return rowToJob(rows[0] as Record<string, unknown>);
+  });
+
+const channelColumn = {
+  email: "gen_email",
+  linkedin: "gen_linkedin",
+  whatsapp: "gen_whatsapp",
+} as const;
+
+export const saveGeneratedMessage = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        channel: z.enum(["email", "linkedin", "whatsapp"]),
+        text: z.string(),
+        jobDescription: z.string().default(""),
+        aiExtra: z.string().default(""),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { ensureSchema, getSql, rowToJob } = await import("./db.server");
+    await ensureSchema();
+    const sql = getSql();
+    const col = channelColumn[data.channel];
+    const rows = await sql`
+      UPDATE jobs SET
+        job_description = ${data.jobDescription},
+        ai_extra = ${data.aiExtra},
+        gen_email = CASE WHEN ${col} = 'gen_email' THEN ${data.text} ELSE gen_email END,
+        gen_linkedin = CASE WHEN ${col} = 'gen_linkedin' THEN ${data.text} ELSE gen_linkedin END,
+        gen_whatsapp = CASE WHEN ${col} = 'gen_whatsapp' THEN ${data.text} ELSE gen_whatsapp END
+      WHERE id = ${data.id}
+      RETURNING *
+    `;
+    const row = rows[0] as Record<string, unknown> | undefined;
+    return row ? rowToJob(row) : null;
   });
 
 export const deleteJob = createServerFn({ method: "POST" })

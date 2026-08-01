@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { generateOutreach } from "@/lib/ai.functions";
+import { saveGeneratedMessage } from "@/lib/jobs.functions";
 import type { Job } from "@/lib/jobs";
 import { cn } from "@/lib/utils";
 
@@ -21,14 +22,25 @@ export function AiComposer({
   job,
   jd,
   onJdChange,
+  extra,
+  onExtraChange,
+  onGenerated,
 }: {
   job: Job;
   jd: string;
   onJdChange: (v: string) => void;
+  extra: string;
+  onExtraChange: (v: string) => void;
+  onGenerated: (channel: Channel, text: string) => void;
 }) {
   const [channel, setChannel] = useState<Channel>("email");
   const [loading, setLoading] = useState(false);
-  const [output, setOutput] = useState("");
+  const stored: Record<Channel, string> = {
+    email: job.genEmail ?? "",
+    linkedin: job.genLinkedin ?? "",
+    whatsapp: job.genWhatsapp ?? "",
+  };
+  const output = stored[channel];
 
   const run = async () => {
     if (!jd.trim()) {
@@ -36,7 +48,6 @@ export function AiComposer({
       return;
     }
     setLoading(true);
-    setOutput("");
     try {
       const res = await generateOutreach({
         data: {
@@ -45,10 +56,19 @@ export function AiComposer({
           company: job.company,
           role: job.role,
           hrName: job.hrName,
+          extra,
           tone: "warm, confident, concise",
         },
       });
-      setOutput(res.text);
+      onGenerated(channel, res.text);
+      try {
+        const saved = await saveGeneratedMessage({
+          data: { id: job.id, channel, text: res.text, jobDescription: jd, aiExtra: extra },
+        });
+        if (!saved) toast.message("Generated — hit Save application to store it");
+      } catch {
+        toast.message("Generated — save the application to store it in the database");
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't generate the message");
     } finally {
@@ -65,6 +85,16 @@ export function AiComposer({
           value={jd}
           placeholder="Paste the job post here — the AI writes the outreach from it."
           onChange={(e) => onJdChange(e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label className="text-xs text-muted-foreground">Extra instructions (optional)</Label>
+        <Textarea
+          rows={3}
+          value={extra}
+          placeholder="e.g. mention my 3 years in fintech, keep it under 100 words, ask about relocation…"
+          onChange={(e) => onExtraChange(e.target.value)}
         />
       </div>
 
