@@ -62,9 +62,10 @@ export function AiComposer({
       });
       onGenerated(channel, res.text);
       try {
-        await saveGeneratedMessage({
+        const saved = await saveGeneratedMessage({
           data: { id: job.id, channel, text: res.text, jobDescription: jd, aiExtra: extra },
         });
+        if (!saved) toast.message("Generated — hit Save application to store it");
       } catch {
         toast.message("Generated — save the application to store it in the database");
       }
